@@ -6,8 +6,15 @@ const cors = require('cors')
 const { Server } = require('socket.io')
 
 app.use(cors())
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
 
-const port = process.env.PORT || 8080
+app.use("/api/users", require("./routes/user.routes"))
+
+const connectDB = require("./utility/db")
+
+connectDB()
+
 const server = http.createServer(app)
 
 const io = new Server(server, {
@@ -21,4 +28,4 @@ io.on('connection', (socket) => {
   console.log(`User connected ${socket.id}`)
 })
 
-server.listen(port, () => 'Server is running on port 3000')
+server.listen(4000, () => console.log(`Server started on port 4000`))

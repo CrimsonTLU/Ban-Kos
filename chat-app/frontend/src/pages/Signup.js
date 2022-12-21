@@ -1,6 +1,5 @@
 import React, { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { useLogin } from "../hooks/useLogin"
+import { useSignup } from "../hooks/useSignup"
 import "../App.css"
 import {
   Box,
@@ -12,28 +11,39 @@ import {
   Typography
 } from "@mui/material"
 
-const LandingPage = () => {
+const Signup = () => {
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const { login, error, isLoading } = useLogin()
+  const { signup, error, isLoading } = useSignup()
 
-  const navigate = useNavigate()
-  const signup = () => {
-    let path = "/signup"
-    navigate(path)
-  }
   const handleSubmit = async e => {
     e.preventDefault()
 
-    await login(email, password)
+    if(!(email.isEmail())){
+      error += " Please enter a valid email! "
+    }
+    
+    if(!(password.isLength({ min: 6 }))){
+      error += " Password length must be atleast 6 characters. "
+    }
+
+    await signup(name, email, password)
   }
 
   return (
     <Box className="mainContainer">
-    <Typography variant="h1">Welcome to Live Chat App</Typography>
-    <Typography variant="h2">Login or Signup to Continue</Typography>
+    <Typography>Sign up</Typography>
     <form onSubmit={handleSubmit}>
         <FormGroup>
+        <FormControl required>
+            <InputLabel>Name</InputLabel>
+            <Input
+            type="text"
+            onChange={e => setName(e.target.value)}
+            value={name}
+            />
+        </FormControl>
         <FormControl required>
             <InputLabel>Email address</InputLabel>
             <Input
@@ -56,21 +66,13 @@ const LandingPage = () => {
             type="submit"
             disabled={isLoading}
         >
-            Log in
-        </Button>
-        <Typography variant="h5">No account?</Typography>
-        <Button
-            color="success"
-            variant="contained"
-            onClick={signup}
-        >
             Sign up
         </Button>
         </FormGroup>
         {error && <Box>{error}</Box>}
     </form>
     </Box>
-)
+  )
 }
 
-export default LandingPage
+export default Signup
