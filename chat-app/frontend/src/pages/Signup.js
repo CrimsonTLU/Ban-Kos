@@ -19,15 +19,7 @@ const Signup = () => {
 
   const handleSubmit = async e => {
     e.preventDefault()
-
-    if(!(email.isEmail())){
-      error += " Please enter a valid email! "
-    }
     
-    if(!(password.isLength({ min: 6 }))){
-      error += " Password length must be atleast 6 characters. "
-    }
-
     await signup(name, email, password)
   }
 

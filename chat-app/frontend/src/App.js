@@ -3,6 +3,7 @@ import { useAuthContext } from "./hooks/useAuthContext"
 import "./App.css"
 import LandingPage from "./pages/LandingPage"
 import Signup from "./pages/Signup"
+import ChatRoom from "./pages/ChatRoom"
 
 export default function App() {
   const { user } = useAuthContext()
@@ -12,11 +13,15 @@ export default function App() {
       <Routes>
         <Route
           path="/"
-          element={<LandingPage />}
+          element={!user ? <LandingPage /> : <Navigate to="/chatroom" />}
         />
         <Route
           path="/signup"
-          element={<Signup />}
+          element={!user ? <Signup /> : <Navigate to="/chatroom" />}
+        />
+        <Route
+          path="/chatroom"
+          element={user ? <ChatRoom /> : <Navigate to="/" />}
         />
       </Routes>
     </BrowserRouter>
