@@ -22,7 +22,7 @@ router.post(
       .matches(/\d/)
       .withMessage("Your password should have at least one number. ")
       .matches(/[!@#$%^&*(),.?":{}|<>]/)
-      .withMessage("Your password should have at least one sepcial character.")
+      .withMessage("Your password should have at least one special character.")
   ],
   (req, res, next) => {
     const error = validationResult(req).formatWith(({ msg }) => msg)

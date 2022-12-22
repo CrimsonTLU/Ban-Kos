@@ -4,6 +4,7 @@ import "./App.css"
 import LandingPage from "./pages/LandingPage"
 import Signup from "./pages/Signup"
 import ChatRoom from "./pages/ChatRoom"
+import WaitingRoom from "./pages/WaitingRoom"
 
 export default function App() {
   const { user } = useAuthContext()
@@ -13,11 +14,15 @@ export default function App() {
       <Routes>
         <Route
           path="/"
-          element={!user ? <LandingPage /> : <Navigate to="/chatroom" />}
+          element={!user ? <LandingPage /> : <Navigate to="/waitingroom" />}
         />
         <Route
           path="/signup"
-          element={!user ? <Signup /> : <Navigate to="/chatroom" />}
+          element={!user ? <Signup /> : <Navigate to="/waitingroom" />}
+        />
+        <Route
+          path="/waitingroom"
+          element={user ? <WaitingRoom /> : <Navigate to="/" />}
         />
         <Route
           path="/chatroom"

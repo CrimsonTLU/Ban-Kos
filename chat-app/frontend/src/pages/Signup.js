@@ -19,50 +19,50 @@ const Signup = () => {
 
   const handleSubmit = async e => {
     e.preventDefault()
-    
+
     await signup(name, email, password)
   }
 
   return (
     <Box className="mainContainer">
-    <Typography>Sign up</Typography>
-    <form onSubmit={handleSubmit}>
+      <Typography>Sign up</Typography>
+      <form onSubmit={handleSubmit}>
         <FormGroup>
-        <FormControl required>
+          <FormControl required>
             <InputLabel>Name</InputLabel>
             <Input
-            type="text"
-            onChange={e => setName(e.target.value)}
-            value={name}
+              type="text"
+              onChange={e => setName(e.target.value)}
+              value={name}
             />
-        </FormControl>
-        <FormControl required>
+          </FormControl>
+          <FormControl required>
             <InputLabel>Email address</InputLabel>
             <Input
-            type="email"
-            onChange={e => setEmail(e.target.value)}
-            value={email}
+              type="email"
+              onChange={e => setEmail(e.target.value)}
+              value={email}
             />
-        </FormControl>
-        <FormControl required>
+          </FormControl>
+          <FormControl required>
             <InputLabel>Password</InputLabel>
             <Input
-            type="password"
-            onChange={e => setPassword(e.target.value)}
-            value={password}
+              type="password"
+              onChange={e => setPassword(e.target.value)}
+              value={password}
             />
-        </FormControl>
-        <Button
+          </FormControl>
+          <Button
             color="success"
             variant="contained"
             type="submit"
             disabled={isLoading}
-        >
+          >
             Sign up
-        </Button>
+          </Button>
         </FormGroup>
         {error && <Box>{error}</Box>}
-    </form>
+      </form>
     </Box>
   )
 }
