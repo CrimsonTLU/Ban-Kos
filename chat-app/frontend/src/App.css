@@ -8,7 +8,8 @@
 .contentContainer {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: top;
+  justify-content: top;
   padding: 25px;
   margin: 10px;
   background-color: aliceblue;
@@ -22,7 +23,8 @@
   align-items: center;
   justify-content: top;
   padding: 5px;
-  background-color: blue;
+  background-color: rgba(73, 73, 224, 0.514);
+  color: rgb(244, 248, 253);
   width: 30%;
 }
 
@@ -31,11 +33,23 @@
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   padding-bottom: 50px;
-  background-color: aquamarine;
+  background-color: rgba(188, 213, 235, 0.233);
+  color: rgb(46, 46, 46);
   width: 70%;
 }
 
 .messageInput {
   padding-top: 20vh;
+}
+
+.authField {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 10px;
+  margin: 5px;
+  gap: 10px;
 }

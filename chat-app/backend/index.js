@@ -31,7 +31,8 @@ app.use(function (req, res, next) {
   next()
 })
 
-const room_id = "chatroom"
+let room_id = "chatroom"
+const Message = require('./models/message.model')
 
 const { addUser, getUser, removeUser } = require('./utility/util')
 
@@ -53,12 +54,12 @@ io.on("connection", socket => {
   socket.on("connect_error", (err) => {
     console.log(`connect_error due to ${err.message}`);
   })
-  socket.on("sendMessage", (message, room_id, callback) => {
+  socket.on("sendMessage", (message, callback) => {
     const user = getUser(socket.id)
     const msgToStore = {
       name: user.name,
+      room_id: "chatroom",
       user_id: user.user_id,
-      room_id,
       text: message
     }
     console.log("message", msgToStore)
@@ -68,7 +69,7 @@ io.on("connection", socket => {
       callback()
     })
   })
-  socket.on("get-messages-history", room_id => {
+  socket.on("get-messages-history", () => {
     Message.find({ room_id }).then(result => {
       socket.emit("output-messages", result)
     })

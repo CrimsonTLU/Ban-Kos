@@ -37,6 +37,6 @@ router.post(
   },
   registerUser
 )
-router.post("/", loginUser)
+router.post("/login", loginUser)
 
 module.exports = router
