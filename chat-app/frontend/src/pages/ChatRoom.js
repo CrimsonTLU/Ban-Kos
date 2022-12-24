@@ -1,23 +1,19 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Box, Button, Typography } from "@mui/material"
-import { useNavigate, Link, useParams, Redirect } from "react-router-dom"
 import io from "socket.io-client"
 import { useLogout } from "../hooks/useLogout"
 import { useAuthContext } from "../hooks/useAuthContext"
 import Messages from "../components/Messages"
-import Input from "../components/Input"
 
 import "../App.css"
 
 let socket
-let newMessage = false
 
 const ChatRoom = () => {
   const { logout } = useLogout()
   const { user } = useAuthContext()
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
-  const [error, setError] = useState(null)
 
   useEffect(() => {
     socket = io("localhost:4000")
@@ -91,7 +87,6 @@ const ChatRoom = () => {
             >
               <input
                 type="text"
-                className="input"
                 placeholder="Type a message"
                 value={message}
                 onChange={event => setMessage(event.target.value)}
