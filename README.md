@@ -2,14 +2,14 @@
 # Author: Christian Hindremäe
 
 # Description:
-# # About
+## About
 Homework for Ban Kos, which involved creating real-time chat application, including following functionalities:
 * Authentication
 * Fetch users list from database
 * Socket.IO implementation for chat
-# # Prerequisites
+## Prerequisites
 * Node.js (v18.17)
-# # How to run
+## How to run
 * Clone the repository
 * Backend:
   * navigate to chat-app/backend
