@@ -1,27 +1,17 @@
 import React from "react"
 import { Box, Typography } from "@mui/material"
-import "../Chat.css"
+import "../Styles/Chat.css"
 
-const Message = ({ message: { name, user_id, text }, current_uid }) => {
-  let isCurrentUser = false
-  if (user_id === current_uid) {
-    isCurrentUser = true
-  }
-  return isCurrentUser ? (
-    <Box className="alignRight">
-      <Box className="col s12 m8 16 right">
-        <Typography className="sentbyme">
-          {" "}
-          {name}: {text}
-        </Typography>
-      </Box>
-    </Box>
-  ) : (
-    <Box className="alignLeft">
-      <Box className="col s12 m8 16 left">
-        <Typography className="sentbyothers">
-          {" "}
-          {name}: {text}
+const Message = ({ message, current_name }) => {
+  const isCurrentUser = message.sender === current_name
+
+  return (
+    <Box className={isCurrentUser ? "alignRight" : "alignLeft"}>
+      <Box
+        className={isCurrentUser ? "col s12 m8 16 right" : "col s12 m8 16 left"}
+      >
+        <Typography className={isCurrentUser ? "sentbyme" : "sentbyothers"}>
+          {`${isCurrentUser ? "Me" : message.sender}: `} {message.content}
         </Typography>
       </Box>
     </Box>

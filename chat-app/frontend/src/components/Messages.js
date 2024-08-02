@@ -1,18 +1,19 @@
 import React from "react"
-import Message from "../components/Message"
-import STB from "react-scroll-to-bottom"
+import { Box } from "@mui/material"
+import Message from "./Message"
+import "../Styles/Chat.css"
 
-const Messages = ({ messages, user_id }) => {
+const Messages = ({ messages, name }) => {
   return (
-    <STB className="messages">
-      {messages.map((message, i) => (
+    <Box sx={{ marginBottom: "10vh" }}>
+      {messages.map((msg, index) => (
         <Message
-          key={message._id}
-          message={message}
-          current_uid={user_id}
+          key={index}
+          message={msg}
+          current_name={name}
         />
       ))}
-    </STB>
+    </Box>
   )
 }
 

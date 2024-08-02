@@ -1,37 +1,40 @@
 import { useState } from "react"
 import { useAuthContext } from "./useAuthContext"
+import axios from "axios"
 
 export const useSignup = () => {
-  const [error, setError] = useState(null)
-  const [isLoading, setIsLoading] = useState(null)
+  const [errors, setErrors] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
   const { dispatch } = useAuthContext()
 
   const signup = async (name, email, password) => {
     setIsLoading(true)
-    setError(null)
+    setErrors([])
 
-    const response = await fetch("http://localhost:4000/api/users", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password })
-    })
-    const json = await response.json()
+    try {
+      const response = await axios.post("http://localhost:4000/api/users", {
+        name,
+        email,
+        password
+      })
 
-    if (!response.ok) {
-      setIsLoading(false)
-      setError(json.error)
-    }
-    if (response.ok) {
-      // save the user to local storage
-      localStorage.setItem("user", JSON.stringify(json))
-
-      // update the auth context
-      dispatch({ type: "LOGIN", payload: json })
-
-      // update loading state
+      if (response.status === 201) {
+        const user = response.data
+        localStorage.setItem("user", JSON.stringify(user))
+        dispatch({ type: "LOGIN", payload: user })
+      }
+    } catch (err) {
+      if (err.response && err.response.data.errors) {
+        setErrors(err.response.data.errors)
+      } else if (err.response && err.response.data.message) {
+        setErrors([{ msg: err.response.data.message }])
+      } else {
+        setErrors([{ msg: "Signup failed" }])
+      }
+    } finally {
       setIsLoading(false)
     }
   }
 
-  return { signup, isLoading, error }
+  return { signup, errors, isLoading }
 }

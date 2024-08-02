@@ -1,7 +1,13 @@
 const express = require("express")
 const { check, validationResult } = require("express-validator")
 const router = express.Router()
-const { registerUser, loginUser } = require("../controllers/user.controller")
+const {
+  registerUser,
+  loginUser,
+  getUsers,
+  logoutUser
+} = require("../controllers/user.controller")
+const { protect } = require("../middleware/auth.middleware")
 
 router.post(
   "/",
@@ -24,19 +30,12 @@ router.post(
       .matches(/[!@#$%^&*(),.?":{}|<>]/)
       .withMessage("Your password should have at least one special character.")
   ],
-  (req, res, next) => {
-    const error = validationResult(req).formatWith(({ msg }) => msg)
-
-    const hasError = !error.isEmpty()
-
-    if (hasError) {
-      res.status(422).json({ error: error.array() })
-    } else {
-      next()
-    }
-  },
   registerUser
 )
 router.post("/login", loginUser)
+
+router.post("/logout", protect, logoutUser)
+
+router.get("/", getUsers)
 
 module.exports = router

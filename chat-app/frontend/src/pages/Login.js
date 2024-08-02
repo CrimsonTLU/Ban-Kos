@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useLogin } from "../hooks/useLogin"
-import "../App.css"
+import "../Styles/App.css"
 import {
   Box,
   Button,
@@ -9,31 +9,31 @@ import {
   FormGroup,
   Input,
   InputLabel,
-  Typography
+  Typography,
+  Alert
 } from "@mui/material"
 
 const Login = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const { login, error, isLoading } = useLogin()
-
   const navigate = useNavigate()
+
   const signup = () => {
-    let path = "/signup"
-    navigate(path)
+    navigate("/signup")
   }
+
   const handleSubmit = async e => {
     e.preventDefault()
-
     await login(email, password)
   }
 
   return (
     <Box className="mainContainer">
-      <Typography>Login</Typography>
-      <Box className="formContainer">
+      <Typography variant="h4">Login</Typography>
+      <Box>
         <form onSubmit={handleSubmit}>
-          <FormGroup>
+          <FormGroup className="formContainer">
             <FormControl required>
               <InputLabel>Email address</InputLabel>
               <Input
@@ -58,7 +58,7 @@ const Login = () => {
             >
               Log in
             </Button>
-            <Typography variant="h5">No account?</Typography>
+            <Typography variant="h6">No account?</Typography>
             <Button
               color="success"
               variant="contained"
@@ -67,7 +67,7 @@ const Login = () => {
               Sign up
             </Button>
           </FormGroup>
-          {error && <Box>{error}</Box>}
+          {error && <Alert severity="error">{error}</Alert>}
         </form>
       </Box>
     </Box>

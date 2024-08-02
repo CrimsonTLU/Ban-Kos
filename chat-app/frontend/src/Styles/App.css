@@ -3,10 +3,28 @@
   flex-direction: column;
   align-items: center;
   padding: 5px;
+  gap: 5vh;
+}
+
+.header {
+  display: flex;
+  align-items: left;
+  padding: 5px;
+  padding-left: 10px;
+  width: 100vw;
+  max-height: fit-content;
+  background-color: rgb(94, 206, 94);
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
 }
 
 .contentContainer {
   display: flex;
+  flex: 1;
   flex-direction: row;
   align-items: top;
   justify-content: top;
@@ -14,7 +32,7 @@
   margin: 10px;
   background-color: aliceblue;
   width: 100%;
-  height: 100%;
+  max-height: 90vh;
 }
 
 .users {
@@ -28,22 +46,6 @@
   width: 30%;
 }
 
-.chat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding-bottom: 50px;
-  background-color: rgba(188, 213, 235, 0.233);
-  color: rgb(46, 46, 46);
-  width: 70%;
-}
-
-.messageInput {
-  padding-top: 20vh;
-}
-
 .authField {
   display: flex;
   flex-direction: row;
@@ -52,4 +54,24 @@
   padding: 10px;
   margin: 5px;
   gap: 10px;
+}
+
+.online {
+  background-color: rgba(77, 185, 93, 0.57) !important;
+  padding: 2px;
+  margin: 2px;
+}
+
+.offline {
+  background-color: rgba(142, 132, 132, 0.69) !important;
+  padding: 2px;
+  margin: 2px;
+}
+
+.online:hover {
+  transform: scale(1.1);
+}
+
+.offline:hover {
+  transform: scale(1.1);
 }

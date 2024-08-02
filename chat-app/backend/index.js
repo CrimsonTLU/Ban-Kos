@@ -4,7 +4,7 @@ const app = express()
 const http = require("http").createServer(app)
 const cors = require("cors")
 const socketio = require("socket.io")
-const io = socketio(http,{
+const io = socketio(http, {
   cors: {
     origin: "http://localhost:3000",
     methods: ["GET", "POST"]
@@ -15,7 +15,9 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
+// Routes
 app.use("/api/users", require("./routes/user.routes"))
+app.use("/api/messages", require("./routes/message.routes"))
 
 const connectDB = require("./utility/db")
 
@@ -31,53 +33,57 @@ app.use(function (req, res, next) {
   next()
 })
 
-let room_id = "chatroom"
-const Message = require('./models/message.model')
+// Socket.IO
+let room_id = "universal"
+const Message = require("./models/message.model")
 
-const { addUser, getUser, removeUser } = require('./utility/util')
+let connectedUsers = []
 
 io.on("connection", socket => {
-  console.log("socket id:" + socket.id)
-  socket.on("join", ({ name, user_id }) => {
-    const { error, user } = addUser({
-      socket_id: socket.id,
-      name,
-      user_id
-    })
+  console.log("New connection")
+
+  socket.on("joinRoom", ({ userId, userName }) => {
+    const user = { id: socket.id, userId, userName, typing: false }
+    connectedUsers.push(user)
     socket.join(room_id)
-    if (error) {
-      console.log("join error", error)
-    } else {
-      console.log("join user", user)
-    }
+    console.log(`${userName} joined the chatroom`)
+
+    io.to(room_id).emit("connectedUsers", connectedUsers)
+
+    socket.broadcast.to(room_id).emit("userConnected", { userId, userName })
   })
-  socket.on("connect_error", (err) => {
-    console.log(`connect_error due to ${err.message}`);
-  })
-  socket.on("sendMessage", (message, callback) => {
-    const user = getUser(socket.id)
-    const msgToStore = {
-      name: user.name,
-      room_id: "chatroom",
-      user_id: user.user_id,
-      text: message
-    }
-    console.log("message", msgToStore)
-    const msg = new Message(msgToStore)
-    msg.save().then(result => {
-      io.to(room_id).emit("message", result)
-      callback()
+
+  socket.on("sendMessage", async ({ sender, content, chatroomId }) => {
+    const newMessage = new Message({
+      sender,
+      content,
+      chatroomId
     })
+    await newMessage.save()
+    io.to(chatroomId).emit("receive_message", newMessage)
   })
-  socket.on("get-messages-history", () => {
-    Message.find({ room_id }).then(result => {
-      socket.emit("output-messages", result)
-    })
-  })
+
   socket.on("disconnect", () => {
-    console.log(socket.id)
-    const user = removeUser(socket.id) 
-    console.log("user disconnected")
+    console.log("A user disconnected:", socket.id)
+    const user = connectedUsers.find(user => user.id === socket.id)
+    connectedUsers = connectedUsers.filter(user => user.id !== socket.id)
+
+    io.to(room_id).emit("connectedUsers", connectedUsers)
+
+    if (user) {
+      socket.broadcast.to(room_id).emit("userDisconnected", {
+        userId: user.userId,
+        userName: user.userName
+      })
+    }
+  })
+
+  socket.on("typing", ({ userId, typing }) => {
+    const user = connectedUsers.find(user => user.userId === userId)
+    if (user) {
+      user.typing = typing
+    }
+    io.to(room_id).emit("typing", { userId, typing })
   })
 })
 

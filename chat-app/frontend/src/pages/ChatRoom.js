@@ -4,8 +4,9 @@ import io from "socket.io-client"
 import { useLogout } from "../hooks/useLogout"
 import { useAuthContext } from "../hooks/useAuthContext"
 import Messages from "../components/Messages"
-
-import "../App.css"
+import axios from "axios"
+import "../Styles/App.css"
+import "../Styles/Chat.css"
 
 let socket
 
@@ -14,47 +15,92 @@ const ChatRoom = () => {
   const { user } = useAuthContext()
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
+  const [connectedUsers, setConnectedUsers] = useState([])
+  const [typingUsers, setTypingUsers] = useState([])
 
   useEffect(() => {
-    socket = io("localhost:4000")
+    socket = io("http://localhost:4000")
+
     socket.on("connect", () => {
-      console.log("socket connected")
-      console.log(socket.id)
+      console.log("Socket connected")
+      socket.emit("joinRoom", { userId: user._id, userName: user.name })
     })
-    socket.emit("join", { name: user.name, user_id: user._id })
-  }, [])
 
-  useEffect(
-    () => {
-      socket.emit("get-messages-history")
-      socket.on("output-messages", messages => {
-        console.log("Outputting messages")
-        setMessages(messages)
+    socket.on("receive_message", message => {
+      setMessages(prevMessages => [...prevMessages, message])
+    })
+
+    socket.on("connectedUsers", users => {
+      setConnectedUsers(users)
+    })
+
+    socket.on("userConnected", ({ userId, userName }) => {
+      console.log(`${userName} connected`)
+    })
+
+    socket.on("userDisconnected", ({ userId, userName }) => {
+      console.log(`${userName} disconnected`)
+    })
+
+    socket.on("typing", ({ userId, typing }) => {
+      setTypingUsers(prevTypingUsers => {
+        if (typing) {
+          return [...new Set([...prevTypingUsers, userId])]
+        } else {
+          return prevTypingUsers.filter(id => id !== userId)
+        }
       })
-    },
-    [],
-    message
-  )
+    })
+
+    return () => {
+      socket.disconnect()
+    }
+  }, [user])
 
   useEffect(() => {
-    socket.on("message", message => {
-      setMessages([...messages, message])
-    })
-  }, [messages])
+    const fetchMessages = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:4000/api/messages/history/universal`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` }
+          }
+        )
+        setMessages(response.data)
+      } catch (error) {
+        console.error("Failed to fetch messages", error)
+      }
+    }
+
+    fetchMessages()
+  }, [user.token])
 
   const handleClick = () => {
     socket.disconnect()
-    socket.on("disconnect", () => {
-      console.log("Socket disconnected")
-    })
     logout()
   }
 
-  const sendMessage = event => {
+  const handleTyping = () => {
+    socket.emit("typing", { userId: user._id, typing: true })
+    setTimeout(() => {
+      socket.emit("typing", { userId: user._id, typing: false })
+    }, 2000)
+  }
+
+  const sendMessage = async event => {
     event.preventDefault()
-    if (message) {
-      console.log(message)
-      socket.emit("sendMessage", message, () => setMessage(""))
+    if (message.trim()) {
+      const newMessage = {
+        sender: user.name,
+        content: message,
+        chatroomId: "universal"
+      }
+      try {
+        socket.emit("sendMessage", newMessage)
+        setMessage("")
+      } catch (error) {
+        console.error("Failed to send message", error)
+      }
     }
   }
 
@@ -70,16 +116,22 @@ const ChatRoom = () => {
       <Typography variant="h1">Chat Room</Typography>
       <Box className="contentContainer">
         <Box className="users">
-          <Typography variant="h3">Welcome</Typography>
-          {user.name}
+          <Typography variant="h3">Users in chat</Typography>
+          {connectedUsers.map((user, index) => (
+            <Typography key={index}>
+              {user.userName}{" "}
+              {typingUsers.includes(user.userId) && "(typing...)"}
+            </Typography>
+          ))}
         </Box>
         <Box className="chat">
-          <Typography variant="h3">Chat</Typography>
-          <Box className="messageInput">
+          <Box className="messagesContainer">
             <Messages
               messages={messages}
-              user_id={user._id}
+              name={user.name}
             />
+          </Box>
+          <Box className="messageInput">
             <form
               action=""
               onSubmit={sendMessage}
@@ -90,9 +142,13 @@ const ChatRoom = () => {
                 placeholder="Type a message"
                 value={message}
                 onChange={event => setMessage(event.target.value)}
-                onKeyPress={event =>
-                  event.key === "Enter" ? sendMessage(event) : null
-                }
+                onKeyPress={event => {
+                  if (event.key === "Enter") {
+                    sendMessage(event)
+                  } else {
+                    handleTyping()
+                  }
+                }}
               />
               <Button
                 color="success"
